@@ -1,1 +1,1 @@
-test for repo creation 
+Inspired by the work done by the ManimML group (please check them out [here](https://github.com/helblazer811/ManimML/tree/main), and fresh off of reading through code design theory, I want to have a playground to test out organiing code. This is also in response to all of the times I whished that I had a way to *see* what the models in different manuscripts were doing.
