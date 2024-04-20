@@ -1,5 +1,5 @@
 from manim import *
-from ..utils.shapes.conv_shapes import FeatureMap, GriddedRectangle
+from utils.shapes.conv_shapes import FeatureMap, GriddedRectangle
 
 class Conv2d(VGroup):
 
@@ -25,6 +25,8 @@ class Conv2d(VGroup):
 
         # Construct feature map
         fm = FeatureMap(self.in_channels, self.height, self.width)
+
+        fm.rotate(about_point=fm.get_center(), axis=[0, 1, 0], angle=120*DEGREES)
 
         # Create gridded rectangle for animation
         gr = GriddedRectangle(height=self.height, width=self.width)
