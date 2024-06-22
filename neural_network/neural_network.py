@@ -1,7 +1,7 @@
 from manim import *
 
 
-class NeuralNetwork(VGroup):
+class NeuralNetwork(Group):
     """Class for representing an entire neural network"""
     def __init__(self,
                  layer_list: List[VGroup],
@@ -17,12 +17,13 @@ class NeuralNetwork(VGroup):
     def _construct_layers(self):
         """runs the construct method from each layer provided
         also handles the spacing between layers"""
-        layers = []
         for i, (prev_layer, layer) in enumerate(zip([None, *(self.layer_list)], self.layer_list)):
             if i == 0:
                 layer._construct()
             else:
                 layer._construct(prev_layer = prev_layer)
+
+        self.add(VGroup(*self.layer_list))
             
 
     def make_forward_pass_animation(self):

@@ -6,10 +6,11 @@ class FeatureMap(VGroup):
     def __init__(self, num_layers, height, width):
         super().__init__()
         self.num_layers = num_layers
-        self.height = height
-        self.width = width
+        self._height = height
+        self._width = width
 
         self.ancs = np.full((num_layers, 4, 3), np.nan)
+        z_lvl = 0
         # Define the shapes and add them to self
         for i in range(num_layers):
             rectangle = Rectangle(height=height, width=width, stroke_color=BLUE)
@@ -22,7 +23,7 @@ class FeatureMap(VGroup):
             self.add(rectangle)
     
     @property
-    def ancs(self):
+    def surface_ancs(self):
         return self.get_corners_of_rectangle(self.submobjects[self.num_layers - 1])
 
 
