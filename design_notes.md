@@ -18,3 +18,29 @@ Different layers I'd like to support:
 - Upsampling
 - MaxPooling
 - Addition
+
+
+## Development Plan:
+### Pipeline v0.0:
+- [ ] Add forward pass animation to conv2d model
+- [ ] Add ability to customize input layer
+- [ ] Add MaxPooling2DLayer
+- [ ] Complete forward pass animation for simple CNN
+
+### Pipeline v0.1:
+- [ ] Add MLP support
+    - [ ] Add FeedForwardLayer
+    - [ ] Add FeedForward animation
+    - [ ] Add conv layer to MLP animation
+    - [ ] Add dropout support
+- [ ] Flesh out layer positioning
+- [ ] Standardize layer attributes
+
+### Pipeline v0.2:
+- [ ] Add activation function support
+- [ ] Add batch/layer/instance normalization support
+- [ ] Add customization options (color, speed, etc.)
+
+### Pipeline v0.3:
+- [ ] Add layer addition support
+- [ ] Add model compression support (replacing chunks of model with shapes / black boxes)

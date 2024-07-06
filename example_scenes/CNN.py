@@ -19,10 +19,10 @@ class example_scene(Scene):
         self.add(nn)
 
         # Make a forward pass animation
-        # forward_pass = nn.make_forward_pass_animation()
+        forward_pass = nn.make_forward_pass_animation()
         
         # Play animation
-        # self.play(forward_pass)
+        self.play(forward_pass)
 
 # run command line from string
 if __name__ == "__main__":

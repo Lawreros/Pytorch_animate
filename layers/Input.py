@@ -1,5 +1,5 @@
-from manim import BLUE
-from manim import Rectangle, Line, VGroup
+from manim import BLUE, DEGREES, VGroup
+from manim import Rectangle, Line, AnimationGroup
 import numpy as np
 
 class Input(VGroup):
@@ -10,5 +10,13 @@ class Input(VGroup):
 
 
     def _construct(self):
-        rect = Rectangle(width=self._width, height=self._height, color=BLUE)
+        rect = Rectangle(width=self._width, height=self._height, color=BLUE).copy()
+        rect.set_fill(BLUE, opacity=0.2)
+        
+        rect = rect.rotate(about_point=rect.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
+
         self.add(rect)
+
+
+    def forward_pass(self) -> AnimationGroup:
+        """Runs the forward pass of the Input module"""
