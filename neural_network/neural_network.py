@@ -47,8 +47,6 @@ class NeuralNetwork(Group):
             if isinstance(layer, Input): # TODO: Make a global list of layers without animations
                 continue
             else:
-                animations.append(layer.forward_pass())
+                animations.extend(layer.forward_pass())
 
-        return AnimationGroup(*animations)
-
-    
+        return animations  

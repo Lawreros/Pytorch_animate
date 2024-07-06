@@ -1,9 +1,9 @@
-from manim import BLUE, RIGHT, DOWN, UL, UR, DL, DR
+from manim import BLUE, ORANGE, RIGHT, DOWN, UL, UR, DL, DR
 from manim import Rectangle, Line, VGroup
 import numpy as np
 
 class FeatureMap(VGroup):
-    def __init__(self, num_layers, height, width):
+    def __init__(self, num_layers, height, width, color=BLUE):
         super().__init__()
         self.num_layers = num_layers
         self._height = height
@@ -13,8 +13,8 @@ class FeatureMap(VGroup):
         z_lvl = 0
         # Define the shapes and add them to self
         for i in range(num_layers):
-            rectangle = Rectangle(height=height, width=width, stroke_color=BLUE)
-            rectangle.set_fill(BLUE, opacity=0.2)
+            rectangle = Rectangle(height=height, width=width, stroke_color=color)
+            rectangle.set_fill(color, opacity=0.2)
             # rectangle.rotate(about_point=rectangle.get_center(),axis = [0.02, 1, 0], angle=75*DEGREES)
             rectangle.move_to([0, 0, z_lvl-(i/3)])
 
@@ -43,11 +43,11 @@ class FeatureMap(VGroup):
 class GriddedRectangle(VGroup):
     """A rectangle with a grid drawn on it."""
 
-    def __init__(self, height=3, width=3, **kwargs):
+    def __init__(self, height=3, width=3, color=ORANGE, **kwargs):
         super().__init__()
         rectangle = Rectangle(height=height, width=width,
-                              stroke_color=BLUE)
-        rectangle.set_fill(BLUE, opacity=0.2)
+                              stroke_color=color)
+        rectangle.set_fill(color, opacity=0.2)
 
         grid_lines = VGroup()
         v = rectangle.get_vertices()
@@ -60,7 +60,7 @@ class GriddedRectangle(VGroup):
                 Line(
                     v[1] + i * grid_xstep * RIGHT,
                     v[1] + i * grid_xstep * RIGHT + height * DOWN,
-                    stroke_color = BLUE,
+                    stroke_color = color,
                     stroke_width = 1,
                     stroke_opacity = 1,
                     shade_in_3d = True,
@@ -77,7 +77,7 @@ class GriddedRectangle(VGroup):
                 Line(
                     v[1] + i * grid_xstep * DOWN,
                     v[1] + i * grid_xstep * DOWN + width * RIGHT,
-                    stroke_color = BLUE,
+                    stroke_color = color,
                     stroke_width = 1,
                     stroke_opacity = 1,
                     shade_in_3d = True,

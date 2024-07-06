@@ -37,28 +37,52 @@ class Conv2d(VGroup):
         self._width = self.prev_layer._width - self.kernel_size + 1
 
 
-    def make_conv_kernel(self):
+    def make_conv_kernel(self, layer_num: int = 0) -> VGroup:
         
         # Kernels that are applied to previous layer
         grid_recs = []
         for i in self.prev_layer.submobjects:
             grid_rec = GriddedRectangle(height=self.kernel_size, width=self.kernel_size)
-            grid_rec.rotate(about_point=i.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
-            grid_rec.align_to(i.points[4], direction=UL)
+            grid_rec.rotate(about_point=grid_rec.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
+            grid_rec.align_to(i.get_corner(UL), direction=UL)
+            # grid_rec.next_to(i, UL, submobject_to_align=Dot(grid_rec.submobjects[1].points[4]), buff=0.0)
+            # grid_rec.next_to(i.get_corner(UL), UL, buff=0.0)
+
 
             grid_recs.append(grid_rec)
 
 
         # Output of convolution
         out_recs = []
-        for i in self.submobjects[0].submobjects: # TODO: Get a better way of getting info about featuremap
-            out_rec = GriddedRectangle(height=1, width=1)
-            out_rec.rotate(about_point=i.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
-            out_rec.align_to(i.points[4], direction=UL)
+        # for i in self.submobjects[0].submobjects: # TODO: Get a better way of getting info about featuremap
+        i = self.submobjects[0].submobjects[layer_num]
+        out_rec = GriddedRectangle(height=1, width=1)
+        out_rec.rotate(about_point=out_rec.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
+        out_rec.align_to(i.points[4], direction=UL)
             
-            out_recs.append(out_rec)
+        out_recs.append(out_rec)
 
         return self.make_connection_lines(grid_recs, out_recs)
+    
+    def make_conv_animation(self, kernel_vgroup):
+        """Create the animation of a kernel passing over the previous layer"""
+
+        animations = []
+
+        # Vector for moving from the left of the layer to the right
+        l_r_move_vector = (self.prev_layer.submobjects[0].points[0] - self.prev_layer.submobjects[0].points[4]) \
+            - (kernel_vgroup.submobjects[1].submobjects[0].submobjects[1].points[0] - kernel_vgroup.submobjects[1].submobjects[0].submobjects[1].points[4]) # Width of kernel
+
+        u_d_move_vector = (self.prev_layer.submobjects[0].get_corner(DL) - self.prev_layer.submobjects[0].get_corner(UL)) / self.prev_layer._height
+
+
+        iterations = self.prev_layer._height - self.kernel_size + 1
+        for i in range(iterations):
+            animations.append(ApplyMethod(kernel_vgroup.shift, l_r_move_vector))
+            if i != iterations - 1:
+                animations.append(ApplyMethod(kernel_vgroup.shift, u_d_move_vector + -l_r_move_vector))
+
+        return animations
 
 
     @staticmethod
@@ -95,6 +119,15 @@ class Conv2d(VGroup):
 
     def forward_pass(self) -> AnimationGroup:
         """Runs the forward pass of the Conv2d module"""
-        kernel_vgroup = self.make_conv_kernel()
 
-        return AnimationGroup(FadeIn(kernel_vgroup))
+        animations = []
+
+        # Iterate through the convolution once for each output channel
+        for i in range(self.out_channels):
+            kernel_vgroup = self.make_conv_kernel(layer_num=i)
+            animations.append(FadeIn(kernel_vgroup))
+            animations.append(Wait(0.5))
+            animations.extend(self.make_conv_animation(kernel_vgroup))
+            animations.append(FadeOut(kernel_vgroup))
+
+        return animations

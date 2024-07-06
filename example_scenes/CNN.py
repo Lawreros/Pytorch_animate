@@ -12,7 +12,7 @@ class example_scene(Scene):
             layer_list=[
                 Input(width=5, height=5),
                 Conv2d(in_channels=1, out_channels=3, kernel_size=3),
-                # Conv2d(in_channels=3, out_channels=5, kernel_size=3)
+                # Conv2d(in_channels=3, out_channels=2, kernel_size=2)
             ]
         )
 
@@ -22,7 +22,9 @@ class example_scene(Scene):
         forward_pass = nn.make_forward_pass_animation()
         
         # Play animation
-        self.play(forward_pass)
+        for i in forward_pass:
+            self.play(i)
+        # self.play(forward_pass)
 
 # run command line from string
 if __name__ == "__main__":
