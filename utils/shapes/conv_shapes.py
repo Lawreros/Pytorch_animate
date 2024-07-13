@@ -1,5 +1,5 @@
 from manim import BLUE, ORANGE, RIGHT, DOWN, UL, UR, DL, DR
-from manim import Rectangle, Line, VGroup
+from manim import Rectangle, Line, VGroup, Dot
 import numpy as np
 
 class FeatureMap(VGroup):
@@ -8,34 +8,42 @@ class FeatureMap(VGroup):
         self.num_layers = num_layers
         self._height = height
         self._width = width
+        self.ancs = None
 
-        self.ancs = np.full((num_layers, 4, 3), np.nan)
         z_lvl = 0
         # Define the shapes and add them to self
+        layers = VGroup()
+
         for i in range(num_layers):
             rectangle = Rectangle(height=height, width=width, stroke_color=color)
             rectangle.set_fill(color, opacity=0.2)
-            # rectangle.rotate(about_point=rectangle.get_center(),axis = [0.02, 1, 0], angle=75*DEGREES)
-            rectangle.move_to([0, 0, z_lvl-(i/3)])
-
-            self.ancs[i,:,:] = self.get_corners_of_rectangle(rectangle)
+            rectangle.move_to([0, 0, z_lvl+(i/3)])
             
-            self.add(rectangle)
-    
+            layers.add(rectangle)
+        
+        self.ancs = self._generate_ancs(layers)
+        self.add(layers)
+        self.add(self.ancs)
+
+        
+
+    def _generate_ancs(self, layers) -> VGroup:
+        """Generates the anchor points for each layer"""
+        ancs = VGroup()
+        for layer in layers.submobjects:
+            ancs.add(
+                VGroup(
+                Dot(layer.get_corner(UL), fill_opacity=0.0, radius=0.0),
+                Dot(layer.get_corner(UR), fill_opacity=0.0, radius=0.0),
+                Dot(layer.get_corner(DL), fill_opacity=0.0, radius=0.0),
+                Dot(layer.get_corner(DR), fill_opacity=0.0, radius=0.0)
+                )
+            )
+        return ancs
+            
     @property
     def surface_ancs(self):
-        return self.get_corners_of_rectangle(self.submobjects[self.num_layers - 1])
-
-
-    @staticmethod
-    def get_corners_of_rectangle(rectangle):
-        
-        corners = np.full((4,3), np.nan)
-
-        for i in enumerate([UL, UR, DL, DR]):
-            corners[i[0],:] = rectangle.get_corner(i[1])
-        
-        return corners
+        return self.ancs.submobjects[-1]
 
 
 

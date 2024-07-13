@@ -27,9 +27,17 @@ class Conv2d(VGroup):
         # Construct feature map
         fm = FeatureMap(self.out_channels, self._height, self._width)
         
+        # TODO: Pull the rotation outside of the layer construction
         fm = fm.rotate(about_point=fm.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
 
+        self.ancs = fm.ancs
+
         self.add(fm)
+        self.add(self.ancs)
+
+    @property
+    def surface_ancs(self):
+        return self.ancs.submobjects[-1]
 
     def _calculate_size(self):
         """Calculates the size of the current layer based on the previous layer + kernel size"""
@@ -41,10 +49,10 @@ class Conv2d(VGroup):
         
         # Kernels that are applied to previous layer
         grid_recs = []
-        for i in self.prev_layer.submobjects:
+        for i in self.prev_layer.ancs:
             grid_rec = GriddedRectangle(height=self.kernel_size, width=self.kernel_size)
             grid_rec.rotate(about_point=grid_rec.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
-            grid_rec.align_to(i.get_corner(UL), direction=UL)
+            grid_rec.align_to(i[0], direction=UL)
             # grid_rec.next_to(i, UL, submobject_to_align=Dot(grid_rec.submobjects[1].points[4]), buff=0.0)
             # grid_rec.next_to(i.get_corner(UL), UL, buff=0.0)
 
@@ -54,11 +62,10 @@ class Conv2d(VGroup):
 
         # Output of convolution
         out_recs = []
-        # for i in self.submobjects[0].submobjects: # TODO: Get a better way of getting info about featuremap
-        i = self.submobjects[0].submobjects[layer_num]
+        i = self.ancs[layer_num]
         out_rec = GriddedRectangle(height=1, width=1)
         out_rec.rotate(about_point=out_rec.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
-        out_rec.align_to(i.points[4], direction=UL)
+        out_rec.align_to(i, direction=UL)
             
         out_recs.append(out_rec)
 
@@ -70,17 +77,17 @@ class Conv2d(VGroup):
         animations = []
 
         # Vector for moving from the left of the layer to the right
-        l_r_move_vector = (self.prev_layer.submobjects[0].points[0] - self.prev_layer.submobjects[0].points[4]) \
+        l_r_move_vector = (self.prev_layer.surface_ancs[1].get_center() - self.prev_layer.surface_ancs[0].get_center()) \
             - (kernel_vgroup.submobjects[1].submobjects[0].submobjects[1].points[0] - kernel_vgroup.submobjects[1].submobjects[0].submobjects[1].points[4]) # Width of kernel
 
-        u_d_move_vector = (self.prev_layer.submobjects[0].get_corner(DL) - self.prev_layer.submobjects[0].get_corner(UL)) / self.prev_layer._height
-
+        u_d_move_vector = (self.prev_layer.surface_ancs[2].get_center() - self.prev_layer.surface_ancs[0].get_center()) / self.prev_layer._height
 
         iterations = self.prev_layer._height - self.kernel_size + 1
-        for i in range(iterations):
+        for i in range(iterations-1):
             animations.append(ApplyMethod(kernel_vgroup.shift, l_r_move_vector))
-            if i != iterations - 1:
-                animations.append(ApplyMethod(kernel_vgroup.shift, u_d_move_vector + -l_r_move_vector))
+            animations.append(ApplyMethod(kernel_vgroup.shift, u_d_move_vector + -l_r_move_vector))
+        else:
+            animations.append(ApplyMethod(kernel_vgroup.shift, l_r_move_vector))
 
         return animations
 
@@ -107,7 +114,7 @@ class Conv2d(VGroup):
                                 stroke_opacity = 0)
                     lines.append(line)
 
-                line = Line(grid_recs[0].get_corner(i), out_recs[-1].get_corner(i),
+                line = Line(grid_recs[-1].get_corner(i), out_recs[-1].get_corner(i),
                             stroke_color=ORANGE,
                             stroke_width=5,
                             stroke_opacity = 1)

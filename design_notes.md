@@ -22,8 +22,10 @@ Different layers I'd like to support:
 
 ## Development Plan:
 ### Pipeline v0.0:
-- [ ] Add forward pass animation to conv2d model
-- [ ] Add ability to customize input layer
+- [X] Add forward pass animation to conv2d model
+- [X] Create anchor point functionality
+    - [ ] Change rotation so that it happens after layer construction (allowing for anchors to work)
+- [ ] Add ability to customize input layer (more than one channel)
 - [ ] Add MaxPooling2DLayer
 - [ ] Complete forward pass animation for simple CNN
 

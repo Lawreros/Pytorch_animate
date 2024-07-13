@@ -10,9 +10,9 @@ class example_scene(Scene):
     def construct(self):
         nn = NeuralNetwork(
             layer_list=[
-                Input(width=5, height=5),
+                Input(channels=3, width=5, height=5),
                 Conv2d(in_channels=1, out_channels=3, kernel_size=3),
-                # Conv2d(in_channels=3, out_channels=2, kernel_size=2)
+                Conv2d(in_channels=3, out_channels=2, kernel_size=2)
             ]
         )
 
