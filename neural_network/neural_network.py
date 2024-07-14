@@ -25,6 +25,8 @@ class NeuralNetwork(Group):
             else:
                 layer._construct(prev_layer = prev_layer)
 
+            layer.rotate(about_point=layer.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
+
         self._position_layers()
 
         self.add(VGroup(*self.layer_list))

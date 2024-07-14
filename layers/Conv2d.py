@@ -7,11 +7,13 @@ class Conv2d(VGroup):
                  in_channels,
                  out_channels,
                  kernel_size,
+                 padding = 0,
                  **kwargs):
         super().__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.kernel_size = kernel_size
+        self.padding = padding
 
 
     def _construct(self, prev_layer = None) -> VGroup:
@@ -26,9 +28,6 @@ class Conv2d(VGroup):
 
         # Construct feature map
         fm = FeatureMap(self.out_channels, self._height, self._width)
-        
-        # TODO: Pull the rotation outside of the layer construction
-        fm = fm.rotate(about_point=fm.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
 
         self.ancs = fm.ancs
 
@@ -48,26 +47,24 @@ class Conv2d(VGroup):
     def make_conv_kernel(self, layer_num: int = 0) -> VGroup:
         
         # Kernels that are applied to previous layer
-        grid_recs = []
+        grid_recs = VGroup()
         for i in self.prev_layer.ancs:
             grid_rec = GriddedRectangle(height=self.kernel_size, width=self.kernel_size)
             grid_rec.rotate(about_point=grid_rec.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
             grid_rec.align_to(i[0], direction=UL)
-            # grid_rec.next_to(i, UL, submobject_to_align=Dot(grid_rec.submobjects[1].points[4]), buff=0.0)
-            # grid_rec.next_to(i.get_corner(UL), UL, buff=0.0)
 
 
-            grid_recs.append(grid_rec)
+            grid_recs.add(grid_rec)
 
 
         # Output of convolution
-        out_recs = []
+        out_recs = VGroup()
         i = self.ancs[layer_num]
         out_rec = GriddedRectangle(height=1, width=1)
         out_rec.rotate(about_point=out_rec.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
         out_rec.align_to(i, direction=UL)
             
-        out_recs.append(out_rec)
+        out_recs.add(out_rec)
 
         return self.make_connection_lines(grid_recs, out_recs)
     
@@ -78,7 +75,7 @@ class Conv2d(VGroup):
 
         # Vector for moving from the left of the layer to the right
         l_r_move_vector = (self.prev_layer.surface_ancs[1].get_center() - self.prev_layer.surface_ancs[0].get_center()) \
-            - (kernel_vgroup.submobjects[1].submobjects[0].submobjects[1].points[0] - kernel_vgroup.submobjects[1].submobjects[0].submobjects[1].points[4]) # Width of kernel
+            - (kernel_vgroup.submobjects[0][-1].ancs[1].get_center() - kernel_vgroup.submobjects[0][-1].ancs[0].get_center())
 
         u_d_move_vector = (self.prev_layer.surface_ancs[2].get_center() - self.prev_layer.surface_ancs[0].get_center()) / self.prev_layer._height
 
@@ -121,13 +118,17 @@ class Conv2d(VGroup):
                 lines.append(line)
 
 
-        return VGroup(VGroup(*lines), VGroup(*grid_recs), VGroup(*out_recs))
+        return VGroup(grid_recs, out_recs, VGroup(*lines))
 
 
     def forward_pass(self) -> AnimationGroup:
         """Runs the forward pass of the Conv2d module"""
 
         animations = []
+
+        if self.padding:
+            raise NotImplementedError("Padding not yet implemented")
+            
 
         # Iterate through the convolution once for each output channel
         for i in range(self.out_channels):

@@ -24,18 +24,21 @@ Different layers I'd like to support:
 ### Pipeline v0.0:
 - [X] Add forward pass animation to conv2d model
 - [X] Create anchor point functionality
-    - [ ] Change rotation so that it happens after layer construction (allowing for anchors to work)
-- [ ] Add ability to customize input layer (more than one channel)
+    - [X] Change rotation so that it happens after layer construction (allowing for anchors to work)
+- [X] Add ability to make input more than one channel
+- [ ] Add padding to convolutional layer
 - [ ] Add MaxPooling2DLayer
 - [ ] Complete forward pass animation for simple CNN
 
 ### Pipeline v0.1:
+- [ ] Let input layer be an image
+- [ ] Add code so that a call to ancs returns the coordinates, not a point object (remove the need to call `.get_center()`)
 - [ ] Add MLP support
     - [ ] Add FeedForwardLayer
     - [ ] Add FeedForward animation
     - [ ] Add conv layer to MLP animation
     - [ ] Add dropout support
-- [ ] Flesh out layer positioning
+- [ ] Flesh out layer positioning and rotation
 - [ ] Standardize layer attributes
 
 ### Pipeline v0.2:

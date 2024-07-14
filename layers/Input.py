@@ -18,19 +18,14 @@ class Input(VGroup):
         layers = VGroup()
 
         for i in range(self.channels):
-            rectangle = Rectangle(width=self._width, height=self._height, color=BLUE).copy()
+            rectangle = Rectangle(width=self._width, height=self._height, color=BLUE)
             rectangle.set_fill(BLUE, opacity=0.2)
             rectangle.move_to([0, 0, z_lvl+(i/2)])
-            # rectangle = rectangle.rotate(about_point=rectangle.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
 
             layers.add(rectangle)
 
         self.ancs = self._generate_ancs(layers)
-        #TODO: Have the rotation happen to the entire class in order to avoid this...
-        self.ancs = self.ancs.rotate(about_point=layers.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
-        layers = layers.rotate(about_point=layers.get_center(), axis=[0.02, 1, 0], angle=75*DEGREES)
-        
-
+       
         self.add(layers)
         self.add(self.ancs)
 

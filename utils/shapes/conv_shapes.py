@@ -1,4 +1,4 @@
-from manim import BLUE, ORANGE, RIGHT, DOWN, UL, UR, DL, DR
+from manim import BLUE, ORANGE, RIGHT, DOWN, UL, UR, DL, DR, DashedVMobject
 from manim import Rectangle, Line, VGroup, Dot
 import numpy as np
 
@@ -51,50 +51,90 @@ class FeatureMap(VGroup):
 class GriddedRectangle(VGroup):
     """A rectangle with a grid drawn on it."""
 
-    def __init__(self, height=3, width=3, color=ORANGE, **kwargs):
+    # TODO: Add more input parameters to allow for more customization
+    def __init__(self,
+                 height=3,
+                 width=3,
+                 color=ORANGE,
+                 fill_opacity=0.2,
+                 show_grid_lines=True,
+                 dotted_lines=False,
+                **kwargs):
         super().__init__()
         rectangle = Rectangle(height=height, width=width,
                               stroke_color=color)
-        rectangle.set_fill(color, opacity=0.2)
+        rectangle.set_fill(color, opacity=fill_opacity)
+
+        # Before the rectangle gets changed into a dashed rectangle
+        # (which has different attributes than a rectangle) 
+        # generate the ancs
+
+        self.ancs = self._generate_ancs(rectangle)
+
+
+        # Draw the grid lines
 
         grid_lines = VGroup()
-        v = rectangle.get_vertices()
-        grid_xstep = 1
-        grid_ystep = 1
-        countx = width / grid_xstep
+        if show_grid_lines:
 
-        gridx = VGroup(
-            *(
-                Line(
-                    v[1] + i * grid_xstep * RIGHT,
-                    v[1] + i * grid_xstep * RIGHT + height * DOWN,
-                    stroke_color = color,
-                    stroke_width = 1,
-                    stroke_opacity = 1,
-                    shade_in_3d = True,
+            v = rectangle.get_vertices()
+            grid_xstep = 1
+            grid_ystep = 1
+            countx = width / grid_xstep
+
+            gridx = VGroup(
+                *(
+                    Line(
+                        v[1] + i * grid_xstep * RIGHT,
+                        v[1] + i * grid_xstep * RIGHT + height * DOWN,
+                        stroke_color = color,
+                        stroke_width = 1,
+                        stroke_opacity = 1,
+                        shade_in_3d = True,
+                    )
+                    for i in range(1, int(countx))
                 )
-                for i in range(1, int(countx))
             )
-        )
 
-        grid_lines.add(gridx)
+            grid_lines.add(gridx)
 
-        county = height / grid_ystep
-        gridy = VGroup(
-            *(
-                Line(
-                    v[1] + i * grid_xstep * DOWN,
-                    v[1] + i * grid_xstep * DOWN + width * RIGHT,
-                    stroke_color = color,
-                    stroke_width = 1,
-                    stroke_opacity = 1,
-                    shade_in_3d = True,
+            county = height / grid_ystep
+            gridy = VGroup(
+                *(
+                    Line(
+                        v[1] + i * grid_xstep * DOWN,
+                        v[1] + i * grid_xstep * DOWN + width * RIGHT,
+                        stroke_color = color,
+                        stroke_width = 1,
+                        stroke_opacity = 1,
+                        shade_in_3d = True,
+                    )
+                    for i in range(1, int(county))
                 )
-                for i in range(1, int(county))
             )
-        )
 
-        grid_lines.add(gridy)
+            grid_lines.add(gridy)
+            
+            # self.add(grid_lines)
+
+
+        if dotted_lines:
+            rectangle = DashedVMobject(
+                rectangle,
+                num_dashes=int((width+height)/2)*20
+            )
         
-        self.add(grid_lines)
-        self.add(rectangle)
+        self.add(VGroup(rectangle, grid_lines))
+        self.add(self.ancs)
+
+    
+    def _generate_ancs(self, rectangle):
+        """Generates the anchor points for each layer"""
+        ancs = VGroup()
+        ancs.add(
+            Dot(rectangle.get_corner(UL), fill_opacity=0.0, radius=0.0),
+            Dot(rectangle.get_corner(UR), fill_opacity=0.0, radius=0.0),
+            Dot(rectangle.get_corner(DL), fill_opacity=0.0, radius=0.0),
+            Dot(rectangle.get_corner(DR), fill_opacity=0.0, radius=0.0)
+        )
+        return ancs
